@@ -1,0 +1,6 @@
+{
+  "name": "ZenFlow: Real-time Event Processor",
+  "description": "A production-ready event processing system with Kafka, PostgreSQL, and Socket.io for real-time dashboard analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
