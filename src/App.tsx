@@ -380,7 +380,7 @@ export default function App() {
       <footer className="relative z-10 border-t border-white/10 py-8 px-6 mt-12 bg-black">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-600">
-            ZenFlow Architecture v1.0.4
+            ZenFlow Architecture v1.0.5
           </span>
           <div className="flex gap-8">
             <button className="text-[10px] uppercase tracking-widest font-bold text-slate-500 hover:text-white transition-colors">Documentation</button>
