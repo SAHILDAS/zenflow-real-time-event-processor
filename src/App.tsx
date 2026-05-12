@@ -52,32 +52,75 @@ export default function App() {
   const [chartData, setChartData] = useState(initialChartData);
   const [isProducing, setIsProducing] = useState(false);
 
-  useEffect(() => {
-    const socket: Socket = io();
+  const generateFakeEvent = () => {
+  const eventTypes = [
+    "PAYMENT_SUCCESS",
+    "ORDER_CREATED",
+    "USER_REGISTERED",
+    "AUTH_SUCCESS",
+    "EMAIL_DISPATCHED",
+    "API_GATEWAY_REQUEST"
+  ];
 
-    socket.on('connect', () => setConnected(true));
-    socket.on('disconnect', () => setConnected(false));
+  const event = {
+    id: crypto.randomUUID(),
+    type: eventTypes[
+      Math.floor(Math.random() * eventTypes.length)
+    ],
+    source: "simulation-engine",
+    timestamp: new Date().toISOString(),
+    data: {
+      amount: Math.floor(Math.random() * 5000)
+    }
+  };
 
-    socket.on('new_event', (event: EventPayload) => {
-      setEvents(prev => [event, ...prev].slice(0, 50));
-      setStats(prev => ({
-        ...prev,
-        total: prev.total + 1,
-        processed: prev.processed + 1,
-        latency: Math.floor(Math.random() * 20) + 30
-      }));
+  setEvents(prev => [event, ...prev].slice(0, 50));
+
+  setStats(prev => ({
+    ...prev,
+    total: prev.total + 1,
+    processed: prev.processed + 1,
+    latency: Math.floor(Math.random() * 20) + 30
+  }));
+
+  setChartData(prev => [
+    ...prev.slice(1),
+    {
+      time: prev.length,
+      value: Math.floor(Math.random() * 50) + 20
+    }
+  ]);
+};
+
+  // useEffect(() => {
+  //   const socket: Socket = io();
+
+  //   socket.on('connect', () => setConnected(true));
+  //   socket.on('disconnect', () => setConnected(false));
+
+  //   socket.on('new_event', (event: EventPayload) => {
+  //     setEvents(prev => [event, ...prev].slice(0, 50));
+  //     setStats(prev => ({
+  //       ...prev,
+  //       total: prev.total + 1,
+  //       processed: prev.processed + 1,
+  //       latency: Math.floor(Math.random() * 20) + 30
+  //     }));
       
-      setChartData(prev => {
-        const newData = [...prev.slice(1), { time: prev.length, value: Math.floor(Math.random() * 50) + 20 }];
-        return newData;
-      });
-    });
+  //     setChartData(prev => {
+  //       const newData = [...prev.slice(1), { time: prev.length, value: Math.floor(Math.random() * 50) + 20 }];
+  //       return newData;
+  //     });
+  //   });
 
-    return () => {
-      socket.disconnect();
-    };
+  //   return () => {
+  //     socket.disconnect();
+  //   };
+  // }, []);
+
+  useEffect(() => {
+  setConnected(true);
   }, []);
-
   const triggerEvent = async () => {
     setIsProducing(true);
     try {
@@ -127,12 +170,25 @@ export default function App() {
               <Plus className="w-4 h-4" />
               Ingest Event
             </button>
-            <button
+            {/* <button
               onClick={() =>
                 fetch('/api/simulate', {
                   method: 'POST',
                 })
               }
+              className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded font-bold text-sm hover:bg-indigo-500 transition-colors active:scale-95"
+            >
+              <Zap className="w-4 h-4" />
+              Simulate Traffic
+            </button> */}
+            <button
+              onClick={() => {
+                for (let i = 0; i < 100; i++) {
+                  setTimeout(() => {
+                    generateFakeEvent();
+                  }, i * 50);
+                }
+              }}
               className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded font-bold text-sm hover:bg-indigo-500 transition-colors active:scale-95"
             >
               <Zap className="w-4 h-4" />
@@ -224,7 +280,7 @@ export default function App() {
                     <p className="text-sm italic italic-serif">Waiting for incoming signal...</p>
                   </div>
                 ) : (
-                  events.map((event) => (
+                  events.map((event: { id: any; type: string; source: any; timestamp: string | number | Date; }) => (
                     <motion.div 
                       key={event.id}
                       initial={{ opacity: 0, x: -10 }}
@@ -324,7 +380,7 @@ export default function App() {
       <footer className="relative z-10 border-t border-white/10 py-8 px-6 mt-12 bg-black">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-600">
-            ZenFlow Architecture v1.0.4
+            ZenFlow Architecture v1.0.5
           </span>
           <div className="flex gap-8">
             <button className="text-[10px] uppercase tracking-widest font-bold text-slate-500 hover:text-white transition-colors">Documentation</button>
